@@ -25,7 +25,9 @@ hostnamectl set-hostname "$NovoHostName" >/dev/null
 sudo bash /opt/McAfee/agent/scripts/uninstall.sh
 sudo /opt/quest/kace/bin/AMPTools uninstall
 
+##Instalando Manage Engine
 cd /home/logindousuario/temp/linux/
+wget --no-check-certificate --content-disposition https://github.com/Gianlucas94/Migration/blob/main/UEMS_LinuxAgent.bin
 
 chmod +x UEMS_LinuxAgent.bin
 ./UEMS_LinuxAgent.bin
