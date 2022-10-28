@@ -1,5 +1,4 @@
 #!/bin/bash
-sudo su
 apt-get install systemd
 
 ##GERANDO NOVO NOME
