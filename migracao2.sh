@@ -7,66 +7,7 @@ userName=$USER
 tmpLinuxDir="/home/${userName}/temp/linux"
 
 main() {
-    log_status "Instalando systemd..."
-    if ! apt-get install systemd; then
-        exit_error "Falha ao instalar systemd"
-    fi
 
-    log_status "Verificando tipo de dispositivo..."
-    case "${deviceType}" in
-    "N")
-        deviceType="LT"
-        ;;
-    "D")
-        deviceType="DT"
-        ;;
-    esac
-
-    NovoHostName="ENCSABCAM${deviceType}${Patrimonio}"
-    log_status "Novo dispositivo: ${NovoHostName}"
-
-    log_status "Alterando hostname..."
-    if ! hostnamectl set-hostname "$NovoHostName" >/dev/null; then
-        exit_error "Falha ao alterar hostname: ${NovoHostName}"
-    fi
-
-    log_status "Desinstalando KACE e McAfee..."
-    if ! sudo bash /opt/McAfee/agent/scripts/uninstall.sh; then
-        exit_error "Falha ao desinstalar McAfee"
-    fi
-
-    if ! sudo /opt/quest/kace/bin/AMPTools uninstall; then
-        exit_error "Falha ao desinstalar McAfee"
-    fi
-
-    log_status "Instalando Manage Engine..."
-    if mkdir -p "${tmpLinuxDir}"; then
-        cd "${tmpLinuxDir}" || exit
-    else
-        exit_error "Falha ao criar diretório: ${tmpLinuxDir}"
-    fi
-
-    declare -A links
-    links[0]="https://github.com/Gianlucas94/Migration/blob/main/UEMS_LinuxAgent.bin?raw=true"
-    links[1]="https://raw.githubusercontent.com/Gianlucas94/Migration/main/serverinfo.json"
-    links[2]="https://raw.githubusercontent.com/Gianlucas94/Migration/main/dns.txt"
-
-    log_status Baixando arquivos de configuração...
-    for link in "${!links[@]}"; do
-        if ! wget --no-check-certificate --content-disposition "${links[$link]}"; then
-            exit_error "Falha ao baixar arquivo do link: ${links[$link]}"
-        fi
-    done
-
-    log_status "Tranformando arquivo UEMS_LinuxAgent.bin em executável..."
-    if ! chmod +x UEMS_LinuxAgent.bin; then
-        exit_error "Falha ao transformar arquivo UEMS_LinuxAgent.bin em executável"
-    fi
-
-    log_status "Executando UEMS_LinuxAgent.bin"
-    if ! ./UEMS_LinuxAgent.bin; then
-        exit_error "Falha ao executar UEMS_LinuxAgent.bin"
-    fi
 
     log_status "Verificando se o ZScaler e o Defender foram instalados"
     until [ -d /opt/zscaler ] && [ -d /opt/microsoft ]; do
