@@ -110,6 +110,7 @@ exit_error() {
     local red="\033[0;31m"
     local color_off="\033[0m"
     echo -e "\n${red}${message}${color_off}\n"
+    exit 1
 }
 
 log_status() {
