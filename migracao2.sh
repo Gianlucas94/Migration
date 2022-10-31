@@ -71,12 +71,10 @@ main() {
     log_status "Verificando se o ZScaler e o Defender foram instalados"
     until [ -d /opt/zscaler ] && [ -d /opt/microsoft ]; do
         spinner="/|\\-/|\\-"
-        while :; do
             for i in $(seq 0 7); do
                 echo -n "${spinner:$i:1}"
                 echo -en "\010"
                 sleep 1
-            done
         done
     done
     exit_sucess "ZScaler e Defender instalados" >/dev/null
@@ -112,7 +110,7 @@ exit_error() {
     local red="\033[0;31m"
     local color_off="\033[0m"
     echo -e "\n${red}${message}${color_off}\n"
-    exit 1
+    exit 0
 }
 
 log_status() {
