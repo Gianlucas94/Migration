@@ -90,7 +90,7 @@ main() {
     fi
 
     log_status "Apagando pasta Temp"
-    if ! rm -rf /home/${userName}/temp; then
+    if ! rm -rf /home/${userName}/temp/linux; then
         exit_error "Falha ao deletar a pasta Temp"
     fi
 
