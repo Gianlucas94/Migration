@@ -103,9 +103,9 @@ exit_success() {
     local message="$1"
     local green="\033[0;32m"
     local color_off="\033[0m"
+    local EndTime=`date '+%H:%M:%S'`
     echo -e "\n${green}${message}${color_off}\n"
-    EndTime=`date '+%H:%M:%S'`
-    echo "FINALIZADO: $EndTime"
+    echo -e "FINALIZADO: $EndTime"
     exit 0
 }
 
