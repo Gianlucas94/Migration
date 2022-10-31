@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+read -p "Press any key to resume ..."
 HostnameVar=$HOSTNAME
 Patrimonio="${HostnameVar:6:8}"
 deviceType="${HostnameVar:5:1}"
