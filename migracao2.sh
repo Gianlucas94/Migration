@@ -88,8 +88,8 @@ main() {
     if ! rm -rf /home/${userName}/temp/linux; then
         exit_error "Falha ao deletar a pasta Temp"
     fi
-    
-    exit_success "Script executado com sucesso"
+
+    exit_success "Script executado com sucesso!"
 }
 
 exit_success() {
