@@ -10,7 +10,7 @@ tmpLinuxDir="/home/${userName}/temp/linux"
 
 main() {
     log_status "Instalando systemd..."
-    if ! apt-get install systemd; then
+    if ! apt-get -y install systemd; then
         exit_error "Falha ao instalar systemd"
     fi
 
