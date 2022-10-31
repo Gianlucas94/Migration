@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+StartTime=`date '+%H:%M:%S'`
+echo "INICIO: $StartTime"
 read -p "Pressione qualquer tecla para iniciar a migração..."
 HostnameVar=$HOSTNAME
 Patrimonio="${HostnameVar:6:8}"
@@ -102,6 +104,8 @@ exit_success() {
     local green="\033[0;32m"
     local color_off="\033[0m"
     echo -e "\n${green}${message}${color_off}\n"
+    EndTime=`date '+%H:%M:%S'`
+    echo "FINALIZADO: $EndTime"
     exit 0
 }
 
