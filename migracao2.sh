@@ -77,7 +77,7 @@ main() {
                 sleep 1
         done
     done
-    exit_sucess "ZScaler e Defender instalados" >/dev/null
+    log_status "ZScaler e Defender instalados" >/dev/null
 
     log_status "Resolvendo o problema do DNS..."
     if ! cat dns.txt >/etc/nsswitch.conf; then
