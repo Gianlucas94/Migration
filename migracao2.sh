@@ -84,6 +84,11 @@ main() {
         exit_error "Falha ao reiniciar gerenciador de rede"
     fi
 
+    echo "Apagando pasta Temp"
+    if ! rm -rf /home/${userName}/temp/linux; then
+        exit_error "Falha ao deletar a pasta Temp"
+    fi
+    
     exit_success "Script executado com sucesso"
 }
 
