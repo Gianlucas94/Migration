@@ -83,7 +83,7 @@ main() {
 
     log_status "Fazendo Backup do nsswitch.conf..."
     if ! cp /etc/nsswitch.conf nsswitch.bak; then
-       exit_error "Falha ao criar o backup do nsswitch.conf"
+       exit_error "Falha ao criar o backup do Ansswitch.conf"
     fi
 
     log_status "Resolvendo o problema do DNS..."
