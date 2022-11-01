@@ -87,13 +87,8 @@ main() {
     fi
 
     log_status "Reiniciando gerenciadores de rede..."
-    if ! systemctl restart network-manager || systemctl restart NetworkManager || systemctl restart systemd-networkd ; then
+    if ! systemctl restart network-manager || ! systemctl restart NetworkManager || ! systemctl restart systemd-networkd ; then
         exit_error "Falha ao reiniciar gerenciador de rede"
-    fi
-
-    log_status "Reiniciando gerenciador de rede (NetworkManager)..."
-    if ! systemctl restart NetworkManager; then
-        exit_error "Falha ao reiniciar gerenciador de rede(NetworkManager)"
     fi
 
     log_status "Apagando pasta Temp"
