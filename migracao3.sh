@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-StartTime=$(date '+%H:%M:%S')
+StartTime=`date '+%H:%M:%S'`
 echo "INICIO: $StartTime"
 read -p "Pressione qualquer tecla para iniciar a migração..."
 HostnameVar=$HOSTNAME
@@ -73,27 +73,22 @@ main() {
     log_status "Verificando se o ZScaler e o Defender foram instalados"
     until [ -d /opt/zscaler ] && [ -d /opt/microsoft ]; do
         spinner="/|\\-/|\\-"
-        for i in $(seq 0 7); do
-            echo -n "${spinner:$i:1}"
-            echo -en "\010"
-            sleep 1
+            for i in $(seq 0 7); do
+                echo -n "${spinner:$i:1}"
+                echo -en "\010"
+                sleep 1
         done
     done
     log_status "ZScaler e Defender instalados" >/dev/null
 
     log_status "Resolvendo o problema do DNS..."
-    if ! cat dns.txt > /etc/nsswitch.conf; then
+    if ! cat dns.txt >/etc/nsswitch.conf; then
         exit_error "Falha ao escrever no arquivo: /etc/nsswitch.conf"
     fi
 
-    log_status "Reiniciando gerenciadores de rede..."
-    if ! systemctl restart network-manager || systemctl restart NetworkManager || systemctl restart systemd-networkd ; then
+    log_status "Reiniciando gerenciador de rede..."
+    if ! systemctl restart network-manager; then
         exit_error "Falha ao reiniciar gerenciador de rede"
-    fi
-
-    log_status "Reiniciando gerenciador de rede (NetworkManager)..."
-    if ! systemctl restart NetworkManager; then
-        exit_error "Falha ao reiniciar gerenciador de rede(NetworkManager)"
     fi
 
     log_status "Apagando pasta Temp"
@@ -108,7 +103,7 @@ exit_success() {
     local message="$1"
     local green="\033[0;32m"
     local color_off="\033[0m"
-    local EndTime=$(date '+%H:%M:%S')
+    local EndTime=`date '+%H:%M:%S'`
     echo -e "\n${green}${message}${color_off}\n"
     echo -e "FINALIZADO: $EndTime"
     exit 0
