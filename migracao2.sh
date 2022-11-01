@@ -81,6 +81,11 @@ main() {
     done
     log_status "ZScaler e Defender instalados" >/dev/null
 
+    log_status "Fazendo Backup do nsswitch.conf..."
+    if ! cp /etc/nsswitch.conf nsswitch.bak; then
+       exit_error "Falha ao criar o backup do nsswitch.conf"
+    fi
+
     log_status "Resolvendo o problema do DNS..."
     if ! cat dns.txt > /etc/nsswitch.conf; then
         exit_error "Falha ao escrever no arquivo: /etc/nsswitch.conf"
