@@ -100,7 +100,7 @@ main() {
  
     for networkmanager in "${!networkmanagers[@]}"; do
         if ! systemctl restart "${networkmanagers[$networkmanager]}"; then
-        exit_error "Falha ao reiniciar o ${networkmanagers[$networkmanager]}"
+            exit_error "Falha ao reiniciar o ${networkmanagers[$networkmanager]}"
         fi
     done
 
