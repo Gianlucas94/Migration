@@ -70,7 +70,7 @@ main() {
         exit_fatal "Falha ao executar UEMS_LinuxAgent.bin"
     fi
 
-    log_status "Verificando se o ZScaler e o Defender foram instalados"
+    log_status "Aguardando o ZScaler e o Defender serem instalados"
     until [ -d /opt/zscaler ] && [ -d /opt/microsoft ]; do
         spinner="/|\\-/|\\-"
         for i in $(seq 0 7); do
