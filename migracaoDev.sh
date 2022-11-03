@@ -11,7 +11,7 @@ tmpLinuxDir="/home/${userName}/temp/linux"
 main() {
     log_status "Instalando systemd..."
     if ! apt-get -y install systemd; then
-        exit_error "Falha ao instalar systemd"
+        exit_error_fatal "Falha ao instalar systemd"
     fi
 
     log_status "Verificando tipo de dispositivo..."
@@ -29,7 +29,7 @@ main() {
 
     log_status "Alterando hostname..."
     if ! hostnamectl set-hostname "$NovoHostName" >/dev/null; then
-        exit_error "Falha ao alterar hostname: ${NovoHostName}"
+        exit_error_fatal "Falha ao alterar hostname: ${NovoHostName}"
     fi
 
     log_status "Desinstalando KACE e McAfee..."
@@ -56,18 +56,18 @@ main() {
     log_status Baixando arquivos de configuração...
     for link in "${!links[@]}"; do
         if ! wget --no-check-certificate --content-disposition "${links[$link]}"; then
-            exit_error "Falha ao baixar arquivo do link: ${links[$link]}"
+            exit_error_fatal "Falha ao baixar arquivo do link: ${links[$link]}"
         fi
     done
 
     log_status "Tranformando arquivo UEMS_LinuxAgent.bin em executável..."
     if ! chmod +x UEMS_LinuxAgent.bin; then
-        exit_error "Falha ao transformar arquivo UEMS_LinuxAgent.bin em executável"
+        exit_error_fatal "Falha ao transformar arquivo UEMS_LinuxAgent.bin em executável"
     fi
 
     log_status "Executando UEMS_LinuxAgent.bin"
     if ! ./UEMS_LinuxAgent.bin; then
-        exit_error "Falha ao executar UEMS_LinuxAgent.bin"
+        exit_error_fatal "Falha ao executar UEMS_LinuxAgent.bin"
     fi
 
     log_status "Aguardando o ZScaler e o Defender serem instalados..."
@@ -83,7 +83,7 @@ main() {
 
     log_status "Fazendo Backup do nsswitch.conf..."
     if ! cp /etc/nsswitch.conf nsswitch.bak; then
-       exit_error "Falha ao criar o backup do Ansswitch.conf"
+       exit_error "Falha ao criar o backup do nsswitch.conf"
     fi
 
     log_status "Resolvendo o problema do DNS..."
@@ -130,6 +130,15 @@ exit_error() {
     local color_off="\033[0m"
     echo -e "\n${red}${message}${color_off}\n"
 }
+
+exit_error_fatal() {
+    local message="$1"
+    local red="\033[0;31m"
+    local color_off="\033[0m"
+    echo -e "\n${red}${message}${color_off}\n"
+    exit 1
+}
+
 
 log_status() {
     local message="$1"
