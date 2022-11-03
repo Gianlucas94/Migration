@@ -116,7 +116,7 @@ main() {
 
 exit_success() {
     local message="$1"
-    local green="\033[0;32m"
+    local green="\033[1;32"
     local color_off="\033[0m"
     local EndTime=$(date '+%H:%M:%S')
     echo -e "\n${green}${message}${color_off}\n"
