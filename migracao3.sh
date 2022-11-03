@@ -9,7 +9,7 @@ userName=$USER
 tmpLinuxDir="/home/${userName}/temp/linux"
 
 main() {
-    log_status "Instalando systemd..."
+    log_step "Instalando systemd..."
     if ! apt-get -y install systemd; then
         exit_fatal "Falha ao instalar systemd"
     fi
@@ -25,23 +25,23 @@ main() {
     esac
 
     NovoHostName="ENCSABCAM${deviceType}${Patrimonio}"
-    log_status "Novo dispositivo: ${NovoHostName}"
+    log_step "Novo dispositivo: ${NovoHostName}"
 
-    log_status "Alterando hostname..."
+    log_step "Alterando hostname..."
     if ! hostnamectl set-hostname "$NovoHostName" >/dev/null; then
         exit_fatal "Falha ao alterar hostname: ${NovoHostName}"
     fi
 
-    log_status "Desinstalando KACE e McAfee..."
+    log_step "Desinstalando KACE e McAfee..."
     if ! sudo bash /opt/McAfee/agent/scripts/uninstall.sh; then
-        exit_error "Falha ao desinstalar KACE"
+        log_error "Falha ao desinstalar KACE"
     fi
 
     if ! sudo /opt/quest/kace/bin/AMPTools uninstall; then
-        exit_error "Falha ao desinstalar McAfee"
+        log_error "Falha ao desinstalar McAfee"
     fi
 
-    log_status "Instalando Manage Engine..."
+    log_step "Instalando Manage Engine..."
     if mkdir -p "${tmpLinuxDir}"; then
         cd "${tmpLinuxDir}" || exit
     else
@@ -53,24 +53,24 @@ main() {
     links[1]="https://raw.githubusercontent.com/Gianlucas94/Migration/main/serverinfo.json"
     links[2]="https://raw.githubusercontent.com/Gianlucas94/Migration/main/dns.txt"
 
-    log_status Baixando arquivos de configuração...
+    log_step Baixando arquivos de configuração...
     for link in "${!links[@]}"; do
         if ! wget --no-check-certificate --content-disposition "${links[$link]}"; then
             exit_fatal "Falha ao baixar arquivo do link: ${links[$link]}"
         fi
     done
 
-    log_status "Tranformando arquivo UEMS_LinuxAgent.bin em executável..."
+    log_step "Tranformando arquivo UEMS_LinuxAgent.bin em executável..."
     if ! chmod +x UEMS_LinuxAgent.bin; then
         exit_fatal "Falha ao transformar arquivo UEMS_LinuxAgent.bin em executável"
     fi
 
-    log_status "Executando UEMS_LinuxAgent.bin"
+    log_step "Executando UEMS_LinuxAgent.bin"
     if ! ./UEMS_LinuxAgent.bin; then
         exit_fatal "Falha ao executar UEMS_LinuxAgent.bin"
     fi
 
-    log_status "Aguardando o ZScaler e o Defender serem instalados"
+    log_step "Aguardando o ZScaler e o Defender serem instalados"
     until [ -d /opt/zscaler ] && [ -d /opt/microsoft ]; do
         spinner="/|\\-/|\\-"
         for i in $(seq 0 7); do
@@ -79,19 +79,19 @@ main() {
             sleep 1
         done
     done
-    log_status "ZScaler e Defender instalados" >/dev/null
+    log_step "ZScaler e Defender instalados" >/dev/null
 
-    log_status "Fazendo Backup do nsswitch.conf..."
+    log_step "Fazendo Backup do nsswitch.conf..."
     if ! cp /etc/nsswitch.conf nsswitch.bak; then
-        exit_error "Falha ao criar o backup do nsswitch.conf"
+        log_error "Falha ao criar o backup do nsswitch.conf"
     fi
 
-    log_status "Resolvendo o problema do DNS..."
+    log_step "Resolvendo o problema do DNS..."
     if ! cat dns.txt >/etc/nsswitch.conf; then
-        exit_error "Falha ao escrever no arquivo: /etc/nsswitch.conf"
+        log_error "Falha ao escrever no arquivo: /etc/nsswitch.conf"
     fi
 
-    log_status "Reiniciando gerenciadores de rede..."
+    log_step "Reiniciando gerenciadores de rede..."
     declare -A networkmanagers
     networkmanagers[0]="network-manager"
     networkmanagers[1]="NetworkManager"
@@ -99,16 +99,16 @@ main() {
     echo ""
     for networkmanager in "${!networkmanagers[@]}"; do
         if ! systemctl restart "${networkmanagers[$networkmanager]}" >/dev/null; then
-                exit_error "Falha ao reiniciar o ${networkmanagers[$networkmanager]}"
+                log_error "Falha ao reiniciar o ${networkmanagers[$networkmanager]}"
                 echo ""
             else
-                log_status "${networkmanagers[$networkmanager]} reiniciado com sucesso."
+                log_positive "${networkmanagers[$networkmanager]} reiniciado com sucesso."
         fi
     done
 
-    log_status "Apagando pasta Temp"
+    log_step "Apagando pasta Temp"
     if ! rm -rf /home/${userName}/temp/linux; then
-        exit_error "Falha ao deletar a pasta Temp"
+        log_error "Falha ao deletar a pasta Temp"
     fi
 
     exit_success "Script executado com sucesso!"
@@ -124,7 +124,7 @@ exit_success() {
     exit 0
 }
 
-exit_error() {
+log_error() {
     local message="$1"
     local red="\033[0;31m"
     local color_off="\033[0m"
@@ -139,11 +139,18 @@ exit_fatal() {
     exit 1
 }
 
-log_status() {
+log_step() {
     local message="$1"
     local yellow="\033[0;33m"
     local color_off="\033[0m"
     echo -e "\n${yellow}${message}${color_off}\n"
+}
+
+log_positive() {
+    local message="$1"
+    local green="\033[0;32m"
+    local color_off="\033[0m"
+    echo -e "\n${green}${message}${color_off}\n"
 }
 
 main
