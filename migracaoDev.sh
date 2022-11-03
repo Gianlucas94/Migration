@@ -79,7 +79,7 @@ main() {
             sleep 1
         done
     done
-    log_status "ZScaler e Defender instalados" >/dev/null
+    log_status "ZScaler e Defender instalados!" >/dev/null
 
     log_status "Fazendo Backup do nsswitch.conf..."
     if ! cp /etc/nsswitch.conf nsswitch.bak; then
@@ -93,6 +93,7 @@ main() {
 
 
     log_status "Reiniciando gerenciadores de rede..."
+    
     declare -A networkmanagers
     networkmanagers[0]="network-manager"
     networkmanagers[1]="NetworkManager"
