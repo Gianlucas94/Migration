@@ -99,10 +99,10 @@ main() {
     echo ""
     for networkmanager in "${!networkmanagers[@]}"; do
         if ! systemctl restart "${networkmanagers[$networkmanager]}" >/dev/null; then
-                log_error "Falha ao reiniciar o ${networkmanagers[$networkmanager]}"
-                echo ""
-            else
-                log_positive "${networkmanagers[$networkmanager]} reiniciado com sucesso."
+            log_error "Falha ao reiniciar o ${networkmanagers[$networkmanager]}"
+            echo ""
+        else
+            log_positive "${networkmanagers[$networkmanager]} reiniciado com sucesso."
         fi
     done
 
