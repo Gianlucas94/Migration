@@ -93,15 +93,16 @@ main() {
 
 
     log_status "Reiniciando gerenciadores de rede..."
-    
+    echo ""
     declare -A networkmanagers
     networkmanagers[0]="network-manager"
     networkmanagers[1]="NetworkManager"
     networkmanagers[2]="systemd-networkd"
  
     for networkmanager in "${!networkmanagers[@]}"; do
-        if ! systemctl restart "${networkmanagers[$networkmanager]}"; then
+        if ! systemctl restart "${networkmanagers[$networkmanager]}" >dev/null; then
             exit_error "Falha ao reiniciar o ${networkmanagers[$networkmanager]}"
+            echo ""
         fi
     done
 
