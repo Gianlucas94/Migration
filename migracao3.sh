@@ -87,7 +87,7 @@ main() {
     fi
 
     log_step "Resolvendo o problema do DNS..."
-    if ! cat dns.txt >/etc/nsswitch.conf; then
+    if ! cat dns.txt > /etc/nsswitch.conf; then
         log_error "Falha ao escrever no arquivo: /etc/nsswitch.conf"
     fi
 
