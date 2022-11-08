@@ -11,25 +11,29 @@ tmpLinuxDir="/home/${userName}/temp/linux"
 main() {
     log_step "Instalando systemd..."
     if ! apt-get -y install systemd; then
-        log_error "Falha ao instalar systemd"
+        exit_fatal "Falha ao instalar systemd"
     fi
 
-    log_status "Verificando tipo de dispositivo..."
-    case "${deviceType}" in
-    "N")
-        deviceType="LT"
-        ;;
-    "D")
-        deviceType="DT"
-        ;;
-    esac
+    if ! ${HostnameVar:0:9} -eq "ENCSABCAM"; then
+        log_status "Verificando tipo de dispositivo..."
+        case "${deviceType}" in
+        "N")
+            deviceType="LT"
+            ;;
+        "D")
+            deviceType="DT"
+            ;;
+        esac
 
-    NovoHostName="ENCSABCAM${deviceType}${Patrimonio}"
-    log_step "Novo dispositivo: ${NovoHostName}"
+        NovoHostName="ENCSABCAM${deviceType}${Patrimonio}"
+        log_step "Novo dispositivo: ${NovoHostName}"
 
-    log_step "Alterando hostname..."
-    if ! hostnamectl set-hostname "$NovoHostName" >/dev/null; then
-        exit_fatal "Falha ao alterar hostname: ${NovoHostName}"
+        log_step "Alterando hostname..."
+        if ! hostnamectl set-hostname "$NovoHostName" >/dev/null; then
+            exit_fatal "Falha ao alterar hostname: ${NovoHostName}"
+        fi
+    else
+        log_step "Hostname já alterado."
     fi
 
     log_step "Desinstalando KACE e McAfee..."
@@ -87,7 +91,7 @@ main() {
     fi
 
     log_step "Resolvendo o problema do DNS..."
-    if ! cat dns.txt > /etc/nsswitch.conf; then
+    if ! cat dns.txt >/etc/nsswitch.conf; then
         log_error "Falha ao escrever no arquivo: /etc/nsswitch.conf"
     fi
 
