@@ -73,12 +73,12 @@ main() {
     done
 
     log_step "Instalando Company Portal"
-    if ! sudo installer -pkg ${tmpMACOSDir}CompanyPortal-Installer.pkg -target /; then
+    if ! sudo installer -pkg "${tmpMACOSDir}\CompanyPortal-Installer.pkg" -target /; then
         exit_fatal "Falha ao instalar o Company Portal"
     fi
 
     log_step "Instalando Manage Engine"
-    if ! sudo installer -pkg UEMS_MacAgent.pkg -target /; then
+    if ! sudo installer -pkg "${tmpMACOSDir}\UEMS_MacAgent.pkg" -target /; then
         exit_fatal "Falha ao instalar o Manage Engine"
     fi
 : '
