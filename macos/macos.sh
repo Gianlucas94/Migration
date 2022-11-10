@@ -67,7 +67,7 @@ main() {
 
     log_step "Baixando arquivos de configuração..."
     for link in "${!links[@]}"; do
-        if ! wget --no-check-certificate --content-disposition "${links[$link]}"; then
+        if ! curl -o "${links[$link]}"; then
             exit_fatal "Falha ao baixar arquivo do link: ${links[$link]}"
         fi
     done
