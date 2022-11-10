@@ -9,7 +9,6 @@ userName=$USER
 tmpMACOSDir="/Users/${userName}/temp/MACOS"
 
 main() {
-
     log_status "Verificando tipo de dispositivo..."
     case "${deviceType}" in
     "N")
@@ -24,7 +23,13 @@ main() {
     log_step "Novo dispositivo: ${NovoHostName}"
 
     log_step "Alterando hostname..."
-    if ! hostnamectl set-hostname "$NovoHostName" >/dev/null; then
+    if ! sudo scutil --set ComputerName "$NovoHostName" >/dev/null; then
+        exit_fatal "Falha ao alterar hostname: ${NovoHostName}"
+    fi
+        if ! sudo scutil --set HostName "$NovoHostName" >/dev/null; then
+        exit_fatal "Falha ao alterar hostname: ${NovoHostName}"
+    fi
+        if ! sudo scutil --set LocalHostName "$NovoHostName" >/dev/null; then
         exit_fatal "Falha ao alterar hostname: ${NovoHostName}"
     fi
 
@@ -55,11 +60,12 @@ main() {
     fi
 
     declare -A links
-    links[0]="https://github.com/Gianlucas94/Migration/blob/main/UEMS_LinuxAgent.bin?raw=true"
-    links[1]="https://raw.githubusercontent.com/Gianlucas94/Migration/main/serverinfo.json"
-    links[2]="https://raw.githubusercontent.com/Gianlucas94/Migration/main/dns.txt"
+    links[0]="https://github.com/Gianlucas94/Migration/blob/bc00e3da437e2d454658db620a29c1ae65d36e57/macos/UEMS_MacAgent.pkg?raw=true"
+    links[1]="https://github.com/Gianlucas94/Migration/blob/main/macos/CompanyPortal-Installer.pkg?raw=true"
+    links[2]="https://raw.githubusercontent.com/Gianlucas94/Migration/main/macos/serverinfo.plist"
+    links[3]="https://raw.githubusercontent.com/Gianlucas94/Migration/main/macos/DMRootCA.crt"
 
-    log_step Baixando arquivos de configuração...
+    log_step "Baixando arquivos de configuração..."
     for link in "${!links[@]}"; do
         if ! wget --no-check-certificate --content-disposition "${links[$link]}"; then
             exit_fatal "Falha ao baixar arquivo do link: ${links[$link]}"
@@ -67,15 +73,15 @@ main() {
     done
 
     log_step "Instalando Company Portal"
-    if ! sudo installer -pkg /path/to/package.pkg -target /; then
-        exit_fatal "Falha ao instalar o Manage Engine"
+    if ! sudo installer -pkg CompanyPortal-Installer.pkg -target /; then
+        exit_fatal "Falha ao instalar o Company Portal"
     fi
 
     log_step "Instalando Manage Engine"
-    if ! sudo installer -pkg /path/to/package.pkg -target /; then
+    if ! sudo installer -pkg UEMS_MacAgent.pkg -target /; then
         exit_fatal "Falha ao instalar o Manage Engine"
     fi
-
+: '
     log_step "Aguardando o ZScaler e o Defender serem instalados"
     until [ -d /opt/zscaler ] && [ -d /opt/microsoft ]; do
         spinner="/|\\-/|\\-"
@@ -111,6 +117,7 @@ main() {
             log_positive "${networkmanagers[$networkmanager]} reiniciado com sucesso."
         fi
     done
+'
 
     log_step "Apagando pasta Temp"
     if ! rm -rf /home/${userName}/temp/linux; then
