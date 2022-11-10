@@ -10,28 +10,31 @@ tmpMACOSDir="/Users/${userName}/temp/MACOS"
 serialNumber=$(system_profiler SPHardwareDataType | awk '/Serial/ {print $4}')
 
 main() {
-    log_status "Verificando tipo de dispositivo..."
-    case "${deviceType}" in
-    "N")
-        deviceType="LT"
-        ;;
-    "D")
-        deviceType="DT"
-        ;;
-    esac
+    if ! ${HostnameVar:0:9} -eq "ENCSABCAM"; then
+        log_status "Verificando tipo de dispositivo..."
+        case "${deviceType}" in
+        "N")
+            deviceType="LT"
+            ;;
+        "D")
+            deviceType="DT"
+            ;;
+        esac
 
-    NovoHostName="ENCSABCAM${deviceType}${Patrimonio}"
-    log_step "Novo dispositivo: ${NovoHostName}"
-
-    log_step "Alterando hostname..."
-    if ! sudo scutil --set ComputerName "$NovoHostName" >/dev/null; then
-        exit_fatal "Falha ao alterar hostname: ${NovoHostName}"
-    fi
+        NovoHostName="ENCSABCAM${deviceType}${Patrimonio}"
+        log_step "Novo dispositivo: ${NovoHostName}"
+        log_step "Alterando hostname..."
+        if ! sudo scutil --set ComputerName "$NovoHostName" >/dev/null; then
+            exit_fatal "Falha ao alterar hostname: ${NovoHostName}"
+        fi
         if ! sudo scutil --set HostName "$NovoHostName" >/dev/null; then
-        exit_fatal "Falha ao alterar hostname: ${NovoHostName}"
-    fi
+            exit_fatal "Falha ao alterar hostname: ${NovoHostName}"
+        fi
         if ! sudo scutil --set LocalHostName "$NovoHostName" >/dev/null; then
-        exit_fatal "Falha ao alterar hostname: ${NovoHostName}"
+            exit_fatal "Falha ao alterar hostname: ${NovoHostName}"
+        fi
+    else
+        log_step "Hostname já alterado."
     fi
 
     log_step "Desinstalando KACE"
@@ -44,12 +47,12 @@ main() {
         log_error "Falha ao desinstalar ATP"
     fi
     log_step "Desinstalando EPM"
-        if ! sudo /usr/local/McAfee/uninstall EPM; then
+    if ! sudo /usr/local/McAfee/uninstall EPM; then
         log_error "Falha ao desinstalar EPM"
     fi
     cd /
     log_step "Desinstalando McAfee Agent"
-        if ! sudo /Library/McAfee/agent/scripts/uninstall.sh; then
+    if ! sudo /Library/McAfee/agent/scripts/uninstall.sh; then
         log_error "Falha ao desinstalar McAfee Agent"
     fi
 
@@ -82,7 +85,7 @@ main() {
     if ! sudo installer -pkg "${tmpMACOSDir}/UEMS_MacAgent.pkg" -target /; then
         exit_fatal "Falha ao instalar o Manage Engine"
     fi
-: '
+    : '
     log_step "Aguardando o ZScaler e o Defender serem instalados"
     until [ -d /opt/zscaler ] && [ -d /opt/microsoft ]; do
         spinner="/|\\-/|\\-"
