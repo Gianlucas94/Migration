@@ -7,6 +7,7 @@ Patrimonio="${HostnameVar:6:8}"
 deviceType="${HostnameVar:5:1}"
 userName=$USER
 tmpMACOSDir="/Users/${userName}/temp/MACOS"
+serialNumber=$(system_profiler SPHardwareDataType | awk '/Serial/ {print $4}')
 
 main() {
     log_status "Verificando tipo de dispositivo..."
@@ -133,6 +134,8 @@ exit_success() {
     local color_off="\033[0m"
     local EndTime=$(date '+%H:%M:%S')
     echo -e "\n${green}${message}${color_off}\n"
+    echo -e "Serial Number: $serialNumber"
+    echo -e "Hostname: $NovoHostName"
     echo -e "FINALIZADO: $EndTime"
     exit 0
 }
