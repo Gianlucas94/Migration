@@ -59,7 +59,7 @@ main() {
         exit_fatal "Falha ao criar diretório: ${tmpMACOSDir}"
     fi
 
-    declare -A links
+    declare -a links
     links[0]="https://github.com/Gianlucas94/Migration/blob/bc00e3da437e2d454658db620a29c1ae65d36e57/macos/UEMS_MacAgent.pkg?raw=true"
     links[1]="https://github.com/Gianlucas94/Migration/blob/main/macos/CompanyPortal-Installer.pkg?raw=true"
     links[2]="https://raw.githubusercontent.com/Gianlucas94/Migration/main/macos/serverinfo.plist"
