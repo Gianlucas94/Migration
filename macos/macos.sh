@@ -139,8 +139,8 @@ exit_success() {
     local color_off="\033[0m"
     local EndTime=$(date '+%H:%M:%S')
     echo -e "\n${green}${message}${color_off}\n"
-    echo -e "Serial Number: ${yellow}${serialNumber}"
-    echo -e "Hostname: ${yellow}${NovoHostName}"
+    echo -e "Serial Number: ${yellow}${serialNumber}${color_off}"
+    echo -e "Hostname: ${yellow}${NovoHostName}${color_off}"
     echo -e "FINALIZADO: $EndTime"
     exit 0
 }
