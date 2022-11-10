@@ -48,7 +48,7 @@ main() {
     fi
     cd /
     log_step "Desinstalando McAfee Agent"
-        if ! sudo/Library/McAfee/agent/scripts/uninstall.sh; then
+        if ! sudo /Library/McAfee/agent/scripts/uninstall.sh; then
         log_error "Falha ao desinstalar McAfee Agent"
     fi
 
