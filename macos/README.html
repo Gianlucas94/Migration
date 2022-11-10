@@ -1,0 +1,34 @@
+<p><strong>READ ME</strong></p>
+
+<p>Follow the steps mentioned below to install/Uninstall Endpoint Central Agent:</p>
+
+<p><u><strong>Installing Mac Agent</strong></u><br />Mac agents can be installed manually in the computers that need to be managed. If a previous version of &nbsp;Endpoint Central agent is already installed in the client computer, then uninstall it before installing the latest agent.<br /> To install the agent, login to the computer as an administrator and follow the steps mentioned below:</p>
+
+<p>1. Login into the Mac computer as administrator and navigate to the location where the agent is downloaded.<br />2. Extract the zip file and &nbsp;locate UEMS_MacAgent.pkg and serverinfo.plist file.<br />3. Double click to install the agent. Ensure that the extracted folder contains both the files in the same location, serverinfo.plist and UEMS_MacAgent.pkg<br />4. Enter administrators password when prompted to complete installation.<br />Once the agent is installed successfully, the Mac computer will be listed in the SoM page in the Endpoint Central web console.</p>
+
+<p><u><strong>Uninstalling Mac agent</strong></u><br />To uninstall the agent from the managed computer, follow the steps mentioned below:</p>
+
+<p>1. Login into the computer as administrator and open the terminal.<br />2. Navigate to the directory /Library/DesktopCentral_Agent/uninstall<br />3. Type sudo chmod 744 uninstall.sh, and enter administrator password when prompted.<br />4. Type the command sudo ./uninstall.sh, this command removes all the files except logs.<br />You have successfully uninstalled the agent from the managed MAC computer.</p>
+
+<p><u><strong>Installing Mac Agent Using SSH</strong></u><br />Installing Mac agents in computers can be done easily through SSH. Using a Mac computer you can remotely connect to other computers and install the Mac agents. To know about installing agents follow the steps mentioned below.</p>
+
+<p>1.Login into the Mac computer as administrator<br />2.Copy the downloaded Mac agent&nbsp;</p>
+
+<ul>
+	<li>Open the terminal</li>
+	<li>Navigate to the location where the agent is downloaded.</li>
+	<li>Type scp DCMacAgent.zip adminusername@hostname: to copy the agent to the target computer.</li>
+	<li>where adminusername - administrator user name of the remote computer &amp;&nbsp;hostname - local host name of the remote computer</li>
+	<li>Agent is copied in the location ~/Users/adminusername in target computer</li>
+</ul>
+
+<p>3.Install the agent in the remote computer</p>
+
+<ul>
+	<li>To login into the target computer using SSH type ssh adminusername@hostname</li>
+	<li>Navigate to the location where the agent is copied, Unzip the agent zip file by typing unzip -oq DCMacAgent.zip</li>
+	<li>Install the agent using the command sudo installer &nbsp;-pkg &nbsp;UEMS_MacAgent.pkg &nbsp;-target &nbsp;/</li>
+	<li>Enter the administrator password when prompted to complete agent installation.</li>
+</ul>
+
+<p><span style="line-height: 20.7999992370605px;">Once the agent is installed successfully, the Mac computer will be listed in the SoM page in the Endpoint Central web console.</span></p>
