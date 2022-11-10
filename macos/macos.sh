@@ -23,6 +23,7 @@ main() {
 
         NovoHostName="ENCSABCAM${deviceType}${Patrimonio}"
         log_step "Novo dispositivo: ${NovoHostName}"
+        echo ""
         log_step "Alterando hostname..."
         if ! sudo scutil --set ComputerName "$NovoHostName" >/dev/null; then
             exit_fatal "Falha ao alterar hostname: ${NovoHostName}"
