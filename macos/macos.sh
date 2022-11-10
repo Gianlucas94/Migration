@@ -10,8 +10,8 @@ tmpMACOSDir="/Users/${userName}/temp/MACOS"
 serialNumber=$(system_profiler SPHardwareDataType | awk '/Serial/ {print $4}')
 
 main() {
-    if ! ${HostnameVar:0:9} -eq "ENCSABCAM"; then
-        log_status "Verificando tipo de dispositivo..."
+    if ! [ ${HostnameVar:0:9} = "ENCSABCAM" ]; then
+        log_step "Verificando tipo de dispositivo..."
         case "${deviceType}" in
         "N")
             deviceType="LT"
