@@ -60,8 +60,8 @@ main() {
     fi
 
     declare -a links
-    links[0]="https://github.com/Gianlucas94/Migration/blob/bc00e3da437e2d454658db620a29c1ae65d36e57/macos/UEMS_MacAgent.pkg?raw=true"
-    links[1]="https://github.com/Gianlucas94/Migration/blob/main/macos/CompanyPortal-Installer.pkg?raw=true"
+    links[0]="https://github.com/Gianlucas94/Migration/raw/main/macos/UEMS_MacAgent.pkg"
+    links[1]="https://github.com/Gianlucas94/Migration/raw/main/macos/CompanyPortal-Installer.pkg"
     links[2]="https://raw.githubusercontent.com/Gianlucas94/Migration/main/macos/serverinfo.plist"
     links[3]="https://raw.githubusercontent.com/Gianlucas94/Migration/main/macos/DMRootCA.crt"
 
@@ -73,7 +73,7 @@ main() {
     done
 
     log_step "Instalando Company Portal"
-    if ! sudo installer -pkg CompanyPortal-Installer.pkg -target /; then
+    if ! sudo installer -pkg ${tmpMACOSDir}CompanyPortal-Installer.pkg -target /; then
         exit_fatal "Falha ao instalar o Company Portal"
     fi
 
