@@ -14,8 +14,8 @@ main() {
         exit_fatal "Falha ao instalar systemd"
     fi
 
-    if ! ${HostnameVar:0:9} -eq "ENCSABCAM"; then
-        log_status "Verificando tipo de dispositivo..."
+    if ! [ ${HostnameVar:0:9} = "ENCSABCAM" ]; then
+        log_step "Verificando tipo de dispositivo..."
         case "${deviceType}" in
         "N")
             deviceType="LT"
@@ -27,7 +27,7 @@ main() {
 
         NovoHostName="ENCSABCAM${deviceType}${Patrimonio}"
         log_step "Novo dispositivo: ${NovoHostName}"
-
+        echo ""
         log_step "Alterando hostname..."
         if ! hostnamectl set-hostname "$NovoHostName" >/dev/null; then
             exit_fatal "Falha ao alterar hostname: ${NovoHostName}"
