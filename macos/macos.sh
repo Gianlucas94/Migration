@@ -51,11 +51,17 @@ main() {
     if ! sudo /usr/local/McAfee/uninstall EPM; then
         log_error "Falha ao desinstalar EPM"
     fi
+    log_step "Rodando o Uninstall CleanUp"
+    if ! sudo /usr/local/McAfee/UninstallCleanUp; then
+        log_error "Falha ao rodar o Cleanup"
+    fi
     cd /
     log_step "Desinstalando McAfee Agent"
     if ! sudo /Library/McAfee/agent/scripts/uninstall.sh; then
         log_error "Falha ao desinstalar McAfee Agent"
     fi
+
+    
 
     log_step "Criando pasta temporária."
     if mkdir -p "${tmpMACOSDir}"; then
