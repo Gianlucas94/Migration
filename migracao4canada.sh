@@ -14,7 +14,7 @@ main() {
         exit_fatal "Falha ao instalar systemd"
     fi
 
-    if ! [ ${HostnameVar:0:9} = "ENCSABCAM" ]; then
+    if ! [ ${HostnameVar:0:9} = "ENCSABVIC" ]; then
         log_step "Verificando tipo de dispositivo..."
         case "${deviceType}" in
         "N")
@@ -31,7 +31,7 @@ main() {
             ;;
         esac
 
-        NovoHostName="ENCSABCAM${deviceType}${Patrimonio}"
+        NovoHostName="ENCSABVIC${deviceType}${Patrimonio}"
         log_step "Novo dispositivo: ${NovoHostName}"
         echo ""
         log_step "Alterando hostname..."

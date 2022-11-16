@@ -2,84 +2,97 @@
 StartTime=$(date '+%H:%M:%S')
 echo "INICIO: $StartTime"
 read -p "Pressione qualquer tecla para iniciar a migração..."
-HostnameVar=$HOSTNAME
+HostnameVar=$(hostname -s)
 Patrimonio="${HostnameVar:6:8}"
 deviceType="${HostnameVar:5:1}"
 userName=$USER
-tmpLinuxDir="/home/${userName}/temp/linux"
+tmpMACOSDir="/Users/${userName}/temp/MACOS"
+serialNumber=$(system_profiler SPHardwareDataType | awk '/Serial/ {print $4}')
 
 main() {
-    log_step "Instalando systemd..."
-    if ! apt-get -y install systemd; then
-        exit_fatal "Falha ao instalar systemd"
-    fi
-
-    if ! [ ${HostnameVar:0:9} = "ENCSABCAM" ]; then
+    if ! [ ${HostnameVar:0:9} = "ENCSABVIC" ]; then
         log_step "Verificando tipo de dispositivo..."
         case "${deviceType}" in
         "N")
             deviceType="LT"
             ;;
-        "n")
-            deviceType="LT"
-            ;;
         "D")
-            deviceType="DT"
-            ;;
-        "d")
             deviceType="DT"
             ;;
         esac
 
-        NovoHostName="ENCSABCAM${deviceType}${Patrimonio}"
+        NovoHostName="ENCSABVIC${deviceType}${Patrimonio}"
         log_step "Novo dispositivo: ${NovoHostName}"
         echo ""
         log_step "Alterando hostname..."
-        if ! hostnamectl set-hostname "$NovoHostName" >/dev/null; then
+        if ! sudo scutil --set ComputerName "$NovoHostName" >/dev/null; then
+            exit_fatal "Falha ao alterar hostname: ${NovoHostName}"
+        fi
+        if ! sudo scutil --set HostName "$NovoHostName" >/dev/null; then
+            exit_fatal "Falha ao alterar hostname: ${NovoHostName}"
+        fi
+        if ! sudo scutil --set LocalHostName "$NovoHostName" >/dev/null; then
             exit_fatal "Falha ao alterar hostname: ${NovoHostName}"
         fi
     else
         log_step "Hostname já alterado."
     fi
 
-    log_step "Desinstalando KACE e McAfee..."
-    if ! sudo bash /opt/McAfee/agent/scripts/uninstall.sh; then
+    log_step "Desinstalando KACE"
+    if ! sudo /Library/Application\ Support/Quest/KACE/bin/AMPTools uninstall; then
         log_error "Falha ao desinstalar KACE"
     fi
 
-    if ! sudo /opt/quest/kace/bin/AMPTools uninstall; then
-        log_error "Falha ao desinstalar McAfee"
+    log_step "Desinstalando ATP"
+    if ! sudo /usr/local/McAfee/uninstall ATP; then
+        log_error "Falha ao desinstalar ATP"
+    fi
+    log_step "Desinstalando EPM"
+    if ! sudo /usr/local/McAfee/uninstall EPM; then
+        log_error "Falha ao desinstalar EPM"
+    fi
+    log_step "Rodando o Uninstall CleanUp"
+    if ! sudo /usr/local/McAfee/UninstallCleanUp; then
+        log_error "Falha ao rodar o Cleanup"
+    fi
+    cd /
+    log_step "Desinstalando McAfee Agent"
+    if ! sudo /Library/McAfee/agent/scripts/uninstall.sh; then
+        log_error "Falha ao desinstalar McAfee Agent"
     fi
 
-    log_step "Instalando Manage Engine..."
-    if mkdir -p "${tmpLinuxDir}"; then
-        cd "${tmpLinuxDir}" || exit
+    
+
+    log_step "Criando pasta temporária."
+    if mkdir -p "${tmpMACOSDir}"; then
+        cd "${tmpMACOSDir}" || exit
     else
-        exit_fatal "Falha ao criar diretório: ${tmpLinuxDir}"
+        exit_fatal "Falha ao criar diretório: ${tmpMACOSDir}"
     fi
 
-    declare -A links
-    links[0]="https://github.com/Gianlucas94/Migration/blob/main/UEMS_LinuxAgent.bin?raw=true"
-    links[1]="https://raw.githubusercontent.com/Gianlucas94/Migration/main/serverinfo.json"
-    links[2]="https://raw.githubusercontent.com/Gianlucas94/Migration/main/dns.txt"
+    declare -a links
+    links[0]="https://github.com/Gianlucas94/Migration/raw/main/macos/UEMS_MacAgent.pkg"
+    links[1]="https://github.com/Gianlucas94/Migration/raw/main/macos/CompanyPortal-Installer.pkg"
+    links[2]="https://raw.githubusercontent.com/Gianlucas94/Migration/main/macos/serverinfo.plist"
+    links[3]="https://raw.githubusercontent.com/Gianlucas94/Migration/main/macos/DMRootCA.crt"
 
-    log_step Baixando arquivos de configuração...
+    log_step "Baixando arquivos de configuração..."
     for link in "${!links[@]}"; do
-        if ! wget --no-check-certificate --content-disposition "${links[$link]}"; then
+        if ! curl -OL "${links[$link]}"; then
             exit_fatal "Falha ao baixar arquivo do link: ${links[$link]}"
         fi
     done
 
-    log_step "Tranformando arquivo UEMS_LinuxAgent.bin em executável..."
-    if ! chmod +x UEMS_LinuxAgent.bin; then
-        exit_fatal "Falha ao transformar arquivo UEMS_LinuxAgent.bin em executável"
+    log_step "Instalando Company Portal"
+    if ! sudo installer -pkg "${tmpMACOSDir}/CompanyPortal-Installer.pkg" -target /; then
+        exit_fatal "Falha ao instalar o Company Portal"
     fi
 
-    log_step "Executando UEMS_LinuxAgent.bin"
-    if ! ./UEMS_LinuxAgent.bin; then
-        exit_fatal "Falha ao executar UEMS_LinuxAgent.bin"
+    log_step "Instalando Manage Engine"
+    if ! sudo installer -pkg "${tmpMACOSDir}/UEMS_MacAgent.pkg" -target /; then
+        exit_fatal "Falha ao instalar o Manage Engine"
     fi
-
+    : '
     log_step "Aguardando o ZScaler e o Defender serem instalados"
     until [ -d /opt/zscaler ] && [ -d /opt/microsoft ]; do
         spinner="/|\\-/|\\-"
@@ -97,7 +110,7 @@ main() {
     fi
 
     log_step "Resolvendo o problema do DNS..."
-    if ! cat dns.txt >/etc/nsswitch.conf; then
+    if ! cat dns.txt > /etc/nsswitch.conf; then
         log_error "Falha ao escrever no arquivo: /etc/nsswitch.conf"
     fi
 
@@ -115,6 +128,7 @@ main() {
             log_positive "${networkmanagers[$networkmanager]} reiniciado com sucesso."
         fi
     done
+'
 
     log_step "Apagando pasta Temp"
     if ! rm -rf /home/${userName}/temp/linux; then
@@ -127,9 +141,12 @@ main() {
 exit_success() {
     local message="$1"
     local green="\033[1;32m"
+    local yellow="\033[0;33m"
     local color_off="\033[0m"
     local EndTime=$(date '+%H:%M:%S')
     echo -e "\n${green}${message}${color_off}\n"
+    echo -e "Serial Number: ${yellow}${serialNumber}${color_off}"
+    echo -e "Hostname: ${yellow}${NovoHostName}${color_off}"
     echo -e "FINALIZADO: $EndTime"
     exit 0
 }

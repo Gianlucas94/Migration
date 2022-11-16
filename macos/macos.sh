@@ -16,7 +16,13 @@ main() {
         "N")
             deviceType="LT"
             ;;
+        "n")
+            deviceType="LT"
+            ;;
         "D")
+            deviceType="DT"
+            ;;
+        "d")
             deviceType="DT"
             ;;
         esac
